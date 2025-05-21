@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/JaxonAdams/blog-backend/src/helpers"
+	"github.com/JaxonAdams/blog-backend/src/services/markdown"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -16,11 +16,12 @@ func createRequestHandler() func(ctx context.Context, request events.APIGatewayP
 			return helpers.MakeErrorResponse(400, map[string]string{"message": err.Error()}), nil
 		}
 
-		fmt.Printf("New Post Title: %s\n", parsedRequest.Title)
-		fmt.Printf("New Post Content: %s\n", parsedRequest.Content)
-		fmt.Printf("New Post Tags: %v\n", parsedRequest.Tags)
+		html := markdown.MdToHTML([]byte(parsedRequest.Content))
 
-		return helpers.MakeSuccessResponse(201, parsedRequest), nil
+		response := map[string]string{
+			"html": string(html),
+		}
+		return helpers.MakeSuccessResponse(201, response), nil
 	}
 }
 
