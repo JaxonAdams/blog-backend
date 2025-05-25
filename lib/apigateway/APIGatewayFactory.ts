@@ -1,16 +1,16 @@
 import * as cdk from 'aws-cdk-lib';
 import * as aws_apigatewayv2 from 'aws-cdk-lib/aws-apigatewayv2';
-import { ProjectLambdas } from '../lambda/LambdaFactory';
+import { BlogBackendStack } from '../blog-backend-stack';
 
 export class APIGatewayFactory {
-    private stack: cdk.Stack;
+    private stack: BlogBackendStack;
     private gateway: aws_apigatewayv2.HttpApi;
 
-    constructor(stack: cdk.Stack, lambdas: ProjectLambdas) {
+    constructor(stack: BlogBackendStack) {
         this.stack = stack;
         this.gateway = this.makeHttpApi();
 
-        this.loadRoutes(lambdas);
+        this.loadRoutes();
         this.makeCfnOutputs();
     }
 
@@ -28,10 +28,10 @@ export class APIGatewayFactory {
         });
     }
 
-    private loadRoutes(lambdas: ProjectLambdas): void {
+    private loadRoutes(): void {
         const {
             createPostLambda,
-        } = lambdas;
+        } = this.stack.lambdas;
 
         this.gateway.addRoutes({
             path: '/api/v1/posts',

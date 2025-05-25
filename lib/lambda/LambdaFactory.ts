@@ -1,11 +1,12 @@
 import * as cdk from 'aws-cdk-lib';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
+import { BlogBackendStack } from '../blog-backend-stack';
 
 export class LambdaFactory {
-    private stack: cdk.Stack;
+    private stack: BlogBackendStack;
     private lambdas: ProjectLambdas;
 
-    constructor(stack: cdk.Stack) {
+    constructor(stack: BlogBackendStack) {
         this.stack = stack;
 
         this.lambdas = {
@@ -20,7 +21,9 @@ export class LambdaFactory {
             timeout: cdk.Duration.seconds(30),
             code: lambda.Code.fromAsset('src/api/post/create/build'),
             handler: 'bootstrap',
-            environment: {},
+            environment: {
+                'S3_POSTS_BUCKET_NAME': this.stack.postsBucket.bucketName,
+            },
         });
     }
 
