@@ -2,8 +2,8 @@ import * as cdk from 'aws-cdk-lib';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 
 export class LambdaFactory {
-    private stack: cdk.Stack
-    private lambdas: ProjectLambdas
+    private stack: cdk.Stack;
+    private lambdas: ProjectLambdas;
 
     constructor(stack: cdk.Stack) {
         this.stack = stack;
@@ -29,6 +29,6 @@ export class LambdaFactory {
     }
 }
 
-type ProjectLambdas = {
+export type ProjectLambdas = {
     [key: string]: lambda.Function
 };
