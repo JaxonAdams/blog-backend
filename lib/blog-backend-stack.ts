@@ -7,14 +7,14 @@ import { S3Factory } from './s3/S3Factory';
 
 export class BlogBackendStack extends cdk.Stack {
     public lambdas: ProjectLambdas;
-    public postsBucket: s3.Bucket;
+    public bucket: s3.Bucket;
 
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
         // S3 for storing posts
         const s3Factory = new S3Factory(this);
-        this.postsBucket = s3Factory.getPostsBucket();
+        this.bucket = s3Factory.getBucket();
 
         // Lambdas for API functionality
         const lambdaFactory = new LambdaFactory(this)

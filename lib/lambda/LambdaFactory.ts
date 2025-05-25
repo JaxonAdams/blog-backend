@@ -22,7 +22,7 @@ export class LambdaFactory {
             code: lambda.Code.fromAsset('src/api/post/create/build'),
             handler: 'bootstrap',
             environment: {
-                'S3_POSTS_BUCKET_NAME': this.stack.postsBucket.bucketName,
+                'S3_BUCKET_NAME': this.stack.bucket.bucketName,
             },
         });
     }

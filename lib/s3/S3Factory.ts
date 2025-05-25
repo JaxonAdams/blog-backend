@@ -4,16 +4,16 @@ import { BlogBackendStack } from '../blog-backend-stack';
 
 export class S3Factory {
     private stack: BlogBackendStack;
-    private postsBucket: s3.Bucket;
+    private bucket: s3.Bucket;
 
     constructor(stack: BlogBackendStack) {
         this.stack = stack;
-        this.postsBucket = this.makePostsBucket();
+        this.bucket = this.makeBucket();
 
         this.makeCfnOutputs();
     }
 
-    private makePostsBucket(): s3.Bucket {
+    private makeBucket(): s3.Bucket {
         return new s3.Bucket(this.stack, 'Posts', {
             bucketName: `${this.stack.stackName}-Posts`.toLowerCase(),
             versioned: true,
@@ -23,7 +23,7 @@ export class S3Factory {
     private makeCfnOutputs(): void {
         new cdk.CfnOutput(this.stack, 'PostsBucketNameReference', {
             exportName: `${this.stack.stackName}-PostsBucketName`,
-            value: this.postsBucket.bucketName,
+            value: this.bucket.bucketName,
             description: 'S3 Bucket Name',
         });
     }
@@ -33,10 +33,10 @@ export class S3Factory {
             createPostLambda,
         } = this.stack.lambdas;
 
-        this.postsBucket.grantWrite(createPostLambda);
+        this.bucket.grantWrite(createPostLambda);
     }
 
-    public getPostsBucket(): s3.Bucket {
-        return this.postsBucket;
+    public getBucket(): s3.Bucket {
+        return this.bucket;
     }
 }
