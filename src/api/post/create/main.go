@@ -18,7 +18,7 @@ func createRequestHandler(services models.HandlerServices) func(ctx context.Cont
 			return helpers.MakeErrorResponse(400, map[string]string{"message": err.Error()}), nil
 		}
 
-		createdPost, err := postservice.CreatePost(parsedRequest)
+		createdPost, err := postservice.CreatePost(parsedRequest, services, ctx)
 		if err != nil {
 			return helpers.MakeErrorResponse(500, map[string]string{"message": err.Error()}), nil
 		}

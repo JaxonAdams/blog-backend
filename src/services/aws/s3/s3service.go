@@ -30,7 +30,7 @@ func New(ctx context.Context) *S3Service {
 	}
 }
 
-func (s S3Service) UploadPostHTML(postID, content string, ctx context.Context) error {
+func (s S3Service) UploadPostHTML(postID, content string, ctx context.Context) (string, error) {
 	bucket := os.Getenv("S3_BUCKET_NAME")
 	key := fmt.Sprintf("posts/%s.html", postID)
 	fileType := "text/html"
@@ -45,10 +45,10 @@ func (s S3Service) UploadPostHTML(postID, content string, ctx context.Context) e
 		ctx,
 	)
 
-	return err
+	return key, err
 }
 
-func (s S3Service) UploadPostMd(postID, content string, ctx context.Context) error {
+func (s S3Service) UploadPostMd(postID, content string, ctx context.Context) (string, error) {
 	bucket := os.Getenv("S3_BUCKET_NAME")
 	key := fmt.Sprintf("posts/%s.md", postID)
 	fileType := "text/markdown"
@@ -63,7 +63,7 @@ func (s S3Service) UploadPostMd(postID, content string, ctx context.Context) err
 		ctx,
 	)
 
-	return err
+	return key, err
 }
 
 func (s S3Service) uploadFile(bucket, key, fileType *string, fileReader io.Reader, ctx context.Context) (*s3.PutObjectOutput, error) {
