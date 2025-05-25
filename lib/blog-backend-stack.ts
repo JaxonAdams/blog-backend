@@ -1,20 +1,16 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as aws_apigatewayv2 from 'aws-cdk-lib/aws-apigatewayv2';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
+import { LambdaFactory } from './lambda/LambdaFactory';
 
 export class BlogBackendStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        const createPostLambda = new lambda.Function(this, 'CreatePost', {
-            functionName: `${this.stackName}-CreatePost`,
-            runtime: lambda.Runtime.PROVIDED_AL2023,
-            timeout: cdk.Duration.seconds(30),
-            code: lambda.Code.fromAsset('src/api/post/create/build'),
-            handler: 'bootstrap',
-            environment: {},
-        });
+        const lambdaFactory = new LambdaFactory(this)
+        const {
+            createPostLambda,
+        } = lambdaFactory.getLambdas();
 
         const httpApi = new aws_apigatewayv2.HttpApi(this, 'HttpApi', {
             apiName: this.stackName,
