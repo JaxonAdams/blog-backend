@@ -16,10 +16,10 @@ func CreatePost(input models.CreatePostInput) (models.Post, error) {
 	fmt.Printf("HTML Content: %s", html)
 
 	return models.Post{
-		ID:             "TODO",
-		Title:          input.Title,
-		Tags:           input.Tags,
-		HtmlContentUrl: "TODO",
-		MdContentUrl:   "TODO",
+		ID:        "TODO",
+		Title:     input.Title,
+		Tags:      input.Tags,
+		HtmlS3Key: "TODO",
+		MdS3Key:   "TODO",
 	}, nil
 }
