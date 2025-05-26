@@ -38,6 +38,7 @@ export class LambdaFactory {
             handler: 'bootstrap',
             environment: {
                 'S3_BUCKET_NAME': this.stack.bucket.bucketName,
+                'S3_URL_EXPIRY_SECONDS': '3600',
                 'POST_METADATA_TABLE_NAME': this.stack.table.tableName,
             },
         })

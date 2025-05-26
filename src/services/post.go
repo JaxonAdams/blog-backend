@@ -21,13 +21,13 @@ func CreatePost(input models.CreatePostInput, services models.HandlerServices, c
 	fmt.Printf("HTML Content: %s", html)
 
 	// Store the HTML and Markdown in S3
-	htmlS3Key, err := services.S3Service.UploadPostMd(postID, input.Content, ctx)
+	htmlS3Key, err := services.S3Service.UploadPostHTML(postID, string(html), ctx)
 	if err != nil {
 		log.Fatalf("failed to upload md to s3: %v", err)
 		return postmodel.Post{}, err
 	}
 
-	mdS3Key, err := services.S3Service.UploadPostHTML(postID, string(html), ctx)
+	mdS3Key, err := services.S3Service.UploadPostMd(postID, input.Content, ctx)
 	if err != nil {
 		log.Fatalf("failed to upload html to s3: %v", err)
 		return postmodel.Post{}, err
@@ -59,7 +59,27 @@ func GetPostByID(id string, services models.HandlerServices, ctx context.Context
 		return postmodel.Post{}, err
 	}
 
-	// TODO: create signed URL for HTML and MD content
+	htmlPresignedURL, mdPresignedURL, err := getPresignedUrlsForPost(post, services, ctx)
+	if err != nil {
+		return postmodel.Post{}, err
+	}
+
+	post.HtmlPostUrl = htmlPresignedURL
+	post.MdPostUrl = mdPresignedURL
 
 	return post, nil
+}
+
+func getPresignedUrlsForPost(post postmodel.Post, services models.HandlerServices, ctx context.Context) (string, string, error) {
+	htmlPresignedURL, err := services.S3Service.GetPostHtmlURL(post, ctx)
+	if err != nil {
+		return "", "", err
+	}
+
+	mdPresignedURL, err := services.S3Service.GetPostMdURL(post, ctx)
+	if err != nil {
+		return "", "", err
+	}
+
+	return htmlPresignedURL, mdPresignedURL, nil
 }
