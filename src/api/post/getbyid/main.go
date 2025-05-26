@@ -22,7 +22,6 @@ func createRequestHandler(services models.HandlerServices) func(ctx context.Cont
 
 		post, err := postservice.GetPostByID(parsedRequest.ID, services, ctx)
 		if err != nil {
-			// TODO: fix this error handling logic
 			var notFoundErr dynamodb.ErrCodeNotFound
 			if errors.As(err, &notFoundErr) {
 				return helpers.MakeErrorResponse(404, map[string]string{"message": "Not found"}), nil

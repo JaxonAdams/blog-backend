@@ -56,7 +56,7 @@ func CreatePost(input models.CreatePostInput, services models.HandlerServices, c
 func GetPostByID(id string, services models.HandlerServices, ctx context.Context) (postmodel.Post, error) {
 	post, err := services.DynamoDBService.GetPostById(id, ctx)
 	if err != nil {
-		return postmodel.Post{}, fmt.Errorf("error getting post: %v", err)
+		return postmodel.Post{}, err
 	}
 
 	// TODO: create signed URL for HTML and MD content
