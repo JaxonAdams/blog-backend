@@ -11,6 +11,7 @@ export class LambdaFactory {
 
         this.lambdas = {
             createPostLambda: this.makeCreatePostLambda(),
+            getPostByIdLambda: this.makeGetPostByIdLambda(),
         };
     }
 
@@ -26,6 +27,20 @@ export class LambdaFactory {
                 'POST_METADATA_TABLE_NAME': this.stack.table.tableName,
             },
         });
+    }
+
+    private makeGetPostByIdLambda(): lambda.Function {
+        return new lambda.Function(this.stack, 'GetPostById', {
+            functionName: `${this.stack.stackName}-GetPostById`,
+            runtime: lambda.Runtime.PROVIDED_AL2023,
+            timeout: cdk.Duration.seconds(30),
+            code: lambda.Code.fromAsset('src/api/post/getbyid/build'),
+            handler: 'bootstrap',
+            environment: {
+                'S3_BUCKET_NAME': this.stack.bucket.bucketName,
+                'POST_METADATA_TABLE_NAME': this.stack.table.tableName,
+            },
+        })
     }
 
     public getLambdas(): ProjectLambdas {

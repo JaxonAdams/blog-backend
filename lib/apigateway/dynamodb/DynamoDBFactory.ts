@@ -38,9 +38,11 @@ export class DynamoDBFactory {
     public grantPermissions(): void {
         const {
             createPostLambda,
+            getPostByIdLambda,
         } = this.stack.lambdas;
 
         this.table.grantWriteData(createPostLambda);
+        this.table.grantReadData(getPostByIdLambda);
     }
 
     public getTable(): dynamodb.TableV2 {
