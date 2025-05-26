@@ -8,10 +8,11 @@ import (
 
 	"github.com/JaxonAdams/blog-backend/src/helpers"
 	"github.com/JaxonAdams/blog-backend/src/models"
+	postmodel "github.com/JaxonAdams/blog-backend/src/models/posts"
 	"github.com/JaxonAdams/blog-backend/src/services/markdown"
 )
 
-func CreatePost(input models.CreatePostInput, services models.HandlerServices, ctx context.Context) (models.Post, error) {
+func CreatePost(input models.CreatePostInput, services models.HandlerServices, ctx context.Context) (postmodel.Post, error) {
 	// Create a unique ID for the post
 	postID := helpers.NewID()
 
@@ -23,18 +24,16 @@ func CreatePost(input models.CreatePostInput, services models.HandlerServices, c
 	htmlS3Key, err := services.S3Service.UploadPostMd(postID, input.Content, ctx)
 	if err != nil {
 		log.Fatalf("failed to upload md to s3: %v", err)
-		return models.Post{}, err
+		return postmodel.Post{}, err
 	}
 
 	mdS3Key, err := services.S3Service.UploadPostHTML(postID, string(html), ctx)
 	if err != nil {
 		log.Fatalf("failed to upload html to s3: %v", err)
-		return models.Post{}, err
+		return postmodel.Post{}, err
 	}
 
-	// TODO: Store metadata in DynamoDB, including S3 key
-
-	return models.Post{
+	post := postmodel.Post{
 		ID:         postID,
 		Title:      input.Title,
 		Tags:       input.Tags,
@@ -42,5 +41,14 @@ func CreatePost(input models.CreatePostInput, services models.HandlerServices, c
 		MdS3Key:    mdS3Key,
 		CreatedAt:  time.Now(),
 		ModifiedAt: time.Now(),
-	}, nil
+	}
+
+	// Store metadata in DynamoDB, including S3 key
+	err = services.DynamoDBService.PutNewPost(post, ctx)
+	if err != nil {
+		log.Fatalf("failed to store post metadata in dynamo: %v", err)
+		return postmodel.Post{}, err
+	}
+
+	return post, nil
 }

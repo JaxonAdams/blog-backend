@@ -24,7 +24,6 @@ func New(ctx context.Context) *S3Service {
 	}
 
 	client := s3.NewFromConfig(cfg)
-
 	return &S3Service{
 		client: client,
 	}
