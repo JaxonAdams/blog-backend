@@ -1,7 +1,7 @@
 GO_PATH := ./
 BASE_DIR := src
 BIN_NAME := bootstrap
-LAMBDA_DIRS := api/post/create
+LAMBDA_DIRS := api/post/create api/post/getbyid
 
 all: deps build
 

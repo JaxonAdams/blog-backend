@@ -5,3 +5,7 @@ type CreatePostInput struct {
 	Tags    []string `json:"tags"`
 	Content string   `json:"content" validate:"required"`
 }
+
+type GetPostByIdInput struct {
+	ID string `json:"string" validate:"required"`
+}

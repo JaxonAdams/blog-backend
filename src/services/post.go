@@ -52,3 +52,7 @@ func CreatePost(input models.CreatePostInput, services models.HandlerServices, c
 
 	return post, nil
 }
+
+func GetPostByID(id string, services models.HandlerServices, ctx context.Context) (postmodel.Post, error) {
+	return postmodel.Post{}, nil
+}

@@ -14,17 +14,17 @@ import (
 
 func createRequestHandler(services models.HandlerServices) func(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	return func(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-		parsedRequest, err := helpers.ParseCreatePostInput(request)
+		parsedRequest, err := helpers.ParseGetPostByIdInput(request)
 		if err != nil {
 			return helpers.MakeErrorResponse(400, map[string]string{"message": err.Error()}), nil
 		}
 
-		createdPost, err := postservice.CreatePost(parsedRequest, services, ctx)
+		post, err := postservice.GetPostByID(parsedRequest.ID, services, ctx)
 		if err != nil {
 			return helpers.MakeErrorResponse(500, map[string]string{"message": err.Error()}), nil
 		}
 
-		return helpers.MakeSuccessResponse(201, map[string]any{"post": createdPost}), nil
+		return helpers.MakeSuccessResponse(200, map[string]any{"post": post}), nil
 	}
 }
 

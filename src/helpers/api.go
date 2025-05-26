@@ -23,6 +23,19 @@ func ParseCreatePostInput(request events.APIGatewayProxyRequest) (models.CreateP
 	return input, nil
 }
 
+func ParseGetPostByIdInput(request events.APIGatewayProxyRequest) (models.GetPostByIdInput, error) {
+	pathParams := request.PathParameters
+
+	id, exists := pathParams["post_id"]
+	if !exists {
+		return models.GetPostByIdInput{}, fmt.Errorf("post_id path param is required")
+	}
+
+	return models.GetPostByIdInput{
+		ID: id,
+	}, nil
+}
+
 func MakeSuccessResponse(statusCode int, data any) events.APIGatewayProxyResponse {
 	response := map[string]any{
 		"data": data,
