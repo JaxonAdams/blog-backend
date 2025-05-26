@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 
 	"github.com/JaxonAdams/blog-backend/src/helpers"
 	"github.com/JaxonAdams/blog-backend/src/models"
@@ -21,6 +22,11 @@ func createRequestHandler(services models.HandlerServices) func(ctx context.Cont
 
 		post, err := postservice.GetPostByID(parsedRequest.ID, services, ctx)
 		if err != nil {
+			// TODO: fix this error handling logic
+			var notFoundErr dynamodb.ErrCodeNotFound
+			if errors.As(err, &notFoundErr) {
+				return helpers.MakeErrorResponse(404, map[string]string{"message": "Not found"}), nil
+			}
 			return helpers.MakeErrorResponse(500, map[string]string{"message": err.Error()}), nil
 		}
 

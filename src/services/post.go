@@ -39,8 +39,8 @@ func CreatePost(input models.CreatePostInput, services models.HandlerServices, c
 		Tags:       input.Tags,
 		HtmlS3Key:  htmlS3Key,
 		MdS3Key:    mdS3Key,
-		CreatedAt:  time.Now(),
-		ModifiedAt: time.Now(),
+		CreatedAt:  time.Now().UnixMilli(),
+		ModifiedAt: time.Now().UnixMilli(),
 	}
 
 	// Store metadata in DynamoDB, including S3 key
@@ -54,5 +54,12 @@ func CreatePost(input models.CreatePostInput, services models.HandlerServices, c
 }
 
 func GetPostByID(id string, services models.HandlerServices, ctx context.Context) (postmodel.Post, error) {
-	return postmodel.Post{}, nil
+	post, err := services.DynamoDBService.GetPostById(id, ctx)
+	if err != nil {
+		return postmodel.Post{}, fmt.Errorf("error getting post: %v", err)
+	}
+
+	// TODO: create signed URL for HTML and MD content
+
+	return post, nil
 }
