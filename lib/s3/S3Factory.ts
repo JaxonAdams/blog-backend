@@ -14,8 +14,8 @@ export class S3Factory {
     }
 
     private makeBucket(): s3.Bucket {
-        return new s3.Bucket(this.stack, 'Posts', {
-            bucketName: `${this.stack.stackName}-Posts`.toLowerCase(),
+        return new s3.Bucket(this.stack, 'PostsBucket', {
+            bucketName: `${this.stack.stackName}-PostsBucket`.toLowerCase(),
             versioned: true,
         });
     }

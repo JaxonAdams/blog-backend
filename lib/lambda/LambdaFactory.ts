@@ -23,6 +23,7 @@ export class LambdaFactory {
             handler: 'bootstrap',
             environment: {
                 'S3_BUCKET_NAME': this.stack.bucket.bucketName,
+                'POST_METADATA_TABLE_NAME': this.stack.table.tableName,
             },
         });
     }
