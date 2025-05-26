@@ -39,10 +39,13 @@ export class DynamoDBFactory {
         const {
             createPostLambda,
             getPostByIdLambda,
+            getAllPostsLambda,
         } = this.stack.lambdas;
 
         this.table.grantWriteData(createPostLambda);
+
         this.table.grantReadData(getPostByIdLambda);
+        this.table.grantReadData(getAllPostsLambda);
     }
 
     public getTable(): dynamodb.TableV2 {

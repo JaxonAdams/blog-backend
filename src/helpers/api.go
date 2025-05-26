@@ -1,8 +1,11 @@
 package helpers
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"os"
+	"strconv"
 
 	"github.com/JaxonAdams/blog-backend/src/models"
 	"github.com/aws/aws-lambda-go/events"
@@ -33,6 +36,34 @@ func ParseGetPostByIdInput(request events.APIGatewayProxyRequest) (models.GetPos
 
 	return models.GetPostByIdInput{
 		ID: id,
+	}, nil
+}
+
+func ParseGetPostsInput(request events.APIGatewayProxyRequest) (models.GetPostsInput, error) {
+	var startKey string
+	pageSize, _ := strconv.Atoi(os.Getenv("DEFAULT_PAGE_SIZE"))
+
+	queryStringParams := request.QueryStringParameters
+
+	if v, exists := queryStringParams["pageSize"]; exists {
+		if parsed, err := strconv.Atoi(v); err == nil && parsed > 0 {
+			pageSize = parsed
+		}
+	}
+
+	if v, exists := queryStringParams["startKey"]; exists && v != "" {
+		decoded, err := base64.StdEncoding.DecodeString(v)
+		if err == nil {
+			err := json.Unmarshal(decoded, &startKey)
+			if err != nil {
+				return models.GetPostsInput{}, fmt.Errorf("invalid startKey provided")
+			}
+		}
+	}
+
+	return models.GetPostsInput{
+		PageSize: pageSize,
+		StartKey: startKey,
 	}, nil
 }
 

@@ -12,6 +12,7 @@ export class LambdaFactory {
         this.lambdas = {
             createPostLambda: this.makeCreatePostLambda(),
             getPostByIdLambda: this.makeGetPostByIdLambda(),
+            getAllPostsLambda: this.makeGetAllPostsLambda(),
         };
     }
 
@@ -40,6 +41,20 @@ export class LambdaFactory {
                 'S3_BUCKET_NAME': this.stack.bucket.bucketName,
                 'S3_URL_EXPIRY_SECONDS': '3600',
                 'POST_METADATA_TABLE_NAME': this.stack.table.tableName,
+            },
+        })
+    }
+
+    private makeGetAllPostsLambda(): lambda.Function {
+        return new lambda.Function(this.stack, 'GetAllPosts', {
+            functionName: `${this.stack.stackName}-GetAllPosts`,
+            runtime: lambda.Runtime.PROVIDED_AL2023,
+            timeout: cdk.Duration.seconds(30),
+            code: lambda.Code.fromAsset('src/api/post/getall/build'),
+            handler: 'bootstrap',
+            environment: {
+                'POST_METADATA_TABLE_NAME': this.stack.table.tableName,
+                'DEFAULT_PAGE_SIZE': '20',
             },
         })
     }

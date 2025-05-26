@@ -70,6 +70,10 @@ func GetPostByID(id string, services models.HandlerServices, ctx context.Context
 	return post, nil
 }
 
+func GetAllPosts(input models.GetPostsInput, services models.HandlerServices, ctx context.Context) ([]postmodel.Post, map[string]any, error) {
+	return []postmodel.Post{}, map[string]any{"nextStartKey": "ABC123"}, nil
+}
+
 func getPresignedUrlsForPost(post postmodel.Post, services models.HandlerServices, ctx context.Context) (string, string, error) {
 	htmlPresignedURL, err := services.S3Service.GetPostHtmlURL(post, ctx)
 	if err != nil {

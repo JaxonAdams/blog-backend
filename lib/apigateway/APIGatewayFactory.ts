@@ -32,6 +32,7 @@ export class APIGatewayFactory {
         const {
             createPostLambda,
             getPostByIdLambda,
+            getAllPostsLambda,
         } = this.stack.lambdas;
 
         this.gateway.addRoutes({
@@ -49,6 +50,15 @@ export class APIGatewayFactory {
             integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
                 'GetPostByIdIntegration',
                 getPostByIdLambda,
+            )
+        });
+
+        this.gateway.addRoutes({
+            path: '/api/v1/posts',
+            methods: [aws_apigatewayv2.HttpMethod.GET],
+            integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
+                'GetAllPostsIntegration',
+                getAllPostsLambda,
             )
         });
     }

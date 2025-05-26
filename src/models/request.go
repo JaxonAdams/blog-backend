@@ -9,3 +9,8 @@ type CreatePostInput struct {
 type GetPostByIdInput struct {
 	ID string `json:"string" validate:"required"`
 }
+
+type GetPostsInput struct {
+	PageSize int
+	StartKey string
+}
