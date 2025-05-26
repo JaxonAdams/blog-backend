@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/JaxonAdams/blog-backend/src/helpers"
 	"github.com/JaxonAdams/blog-backend/src/models"
@@ -34,10 +35,12 @@ func CreatePost(input models.CreatePostInput, services models.HandlerServices, c
 	// TODO: Store metadata in DynamoDB, including S3 key
 
 	return models.Post{
-		ID:        postID,
-		Title:     input.Title,
-		Tags:      input.Tags,
-		HtmlS3Key: htmlS3Key,
-		MdS3Key:   mdS3Key,
+		ID:         postID,
+		Title:      input.Title,
+		Tags:       input.Tags,
+		HtmlS3Key:  htmlS3Key,
+		MdS3Key:    mdS3Key,
+		CreatedAt:  time.Now(),
+		ModifiedAt: time.Now(),
 	}, nil
 }
