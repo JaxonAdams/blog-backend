@@ -55,8 +55,6 @@ func (d DynamoDBService) GetPostById(id string, ctx context.Context) (postmodel.
 		return postmodel.Post{}, err
 	}
 
-	fmt.Printf("Fetched items: %v", result.Items)
-
 	if len(result.Items) == 0 {
 		fmt.Printf("No posts found with ID %s", id)
 		return postmodel.Post{}, ErrCodeNotFound{Msg: fmt.Sprintf("no post found with id %s", id)}
