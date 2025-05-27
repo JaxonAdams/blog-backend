@@ -9,6 +9,7 @@ import (
 
 	"github.com/JaxonAdams/blog-backend/src/models"
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
 
 func ParseCreatePostInput(request events.APIGatewayProxyRequest) (models.CreatePostInput, error) {
@@ -40,7 +41,7 @@ func ParseGetPostByIdInput(request events.APIGatewayProxyRequest) (models.GetPos
 }
 
 func ParseGetPostsInput(request events.APIGatewayProxyRequest) (models.GetPostsInput, error) {
-	var startKey string
+	var startKey map[string]types.AttributeValue
 	pageSize, _ := strconv.Atoi(os.Getenv("DEFAULT_PAGE_SIZE"))
 
 	queryStringParams := request.QueryStringParameters
@@ -52,13 +53,11 @@ func ParseGetPostsInput(request events.APIGatewayProxyRequest) (models.GetPostsI
 	}
 
 	if v, exists := queryStringParams["startKey"]; exists && v != "" {
-		decoded, err := base64.StdEncoding.DecodeString(v)
-		if err == nil {
-			err := json.Unmarshal(decoded, &startKey)
-			if err != nil {
-				return models.GetPostsInput{}, fmt.Errorf("invalid startKey provided")
-			}
+		sk, err := decodeStartKey(v)
+		if err != nil {
+			return models.GetPostsInput{}, err
 		}
+		startKey = sk
 	}
 
 	return models.GetPostsInput{
@@ -103,4 +102,28 @@ func MakeErrorResponse(statusCode int, errorInfo any) events.APIGatewayProxyResp
 		},
 		Body: string(body),
 	}
+}
+
+func decodeStartKey(encoded string) (map[string]types.AttributeValue, error) {
+	decoded, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return nil, fmt.Errorf("startKey is not valid base64: %w", err)
+	}
+
+	var raw map[string]map[string]string
+	if err := json.Unmarshal(decoded, &raw); err != nil {
+		return nil, fmt.Errorf("invalid startKey JSON: %w", err)
+	}
+
+	startKey := make(map[string]types.AttributeValue)
+	for k, val := range raw {
+		if s, ok := val["S"]; ok {
+			startKey[k] = &types.AttributeValueMemberS{Value: s}
+		} else if n, ok := val["N"]; ok {
+			startKey[k] = &types.AttributeValueMemberN{Value: n}
+		} else {
+			return nil, fmt.Errorf("unsupported attribute type for key: %s", k)
+		}
+	}
+	return startKey, nil
 }

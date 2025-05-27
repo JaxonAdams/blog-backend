@@ -2,6 +2,8 @@ package dynamodb
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -35,6 +37,39 @@ func (d DynamoDBService) PutNewPost(post postmodel.Post, ctx context.Context) er
 	item := post.DynamoFormat()
 
 	return d.putItem(table, item, ctx)
+}
+
+func (d DynamoDBService) GetAllPosts(pageSize int32, startKey map[string]types.AttributeValue, ctx context.Context) ([]postmodel.Post, string, error) {
+	table := os.Getenv("POST_METADATA_TABLE_NAME")
+	input := &dynamodb.ScanInput{
+		TableName:         &table,
+		Limit:             &pageSize,
+		ExclusiveStartKey: startKey,
+	}
+
+	result, err := d.client.Scan(ctx, input)
+	if err != nil {
+		return []postmodel.Post{}, "", err
+	}
+
+	var posts []postmodel.Post
+	err = attributevalue.UnmarshalListOfMaps(result.Items, &posts)
+	if err != nil {
+		return posts, "", err
+	}
+
+	// TODO: fix start key issues
+	var nextStartKey string
+	if result.LastEvaluatedKey != nil {
+		marshaledKey, err := attributevalue.MarshalMap(result.LastEvaluatedKey)
+		if err == nil {
+			startKeyJson, _ := json.Marshal(marshaledKey)
+			encodedStartKey := base64.StdEncoding.EncodeToString(startKeyJson)
+			nextStartKey = encodedStartKey
+		}
+	}
+
+	return posts, nextStartKey, nil
 }
 
 func (d DynamoDBService) GetPostById(id string, ctx context.Context) (postmodel.Post, error) {

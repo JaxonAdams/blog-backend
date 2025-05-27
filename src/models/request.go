@@ -1,5 +1,7 @@
 package models
 
+import "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
+
 type CreatePostInput struct {
 	Title   string   `json:"title" validate:"required"`
 	Tags    []string `json:"tags"`
@@ -12,5 +14,5 @@ type GetPostByIdInput struct {
 
 type GetPostsInput struct {
 	PageSize int
-	StartKey string
+	StartKey map[string]types.AttributeValue
 }

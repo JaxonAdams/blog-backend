@@ -71,7 +71,16 @@ func GetPostByID(id string, services models.HandlerServices, ctx context.Context
 }
 
 func GetAllPosts(input models.GetPostsInput, services models.HandlerServices, ctx context.Context) ([]postmodel.Post, map[string]any, error) {
-	return []postmodel.Post{}, map[string]any{"nextStartKey": "ABC123"}, nil
+	posts, nextStartKey, err := services.DynamoDBService.GetAllPosts(int32(input.PageSize), input.StartKey, ctx)
+	if err != nil {
+		return []postmodel.Post{}, map[string]any{}, err
+	}
+
+	metadata := map[string]any{
+		"nextStartKey": nextStartKey,
+	}
+
+	return posts, metadata, nil
 }
 
 func getPresignedUrlsForPost(post postmodel.Post, services models.HandlerServices, ctx context.Context) (string, string, error) {
