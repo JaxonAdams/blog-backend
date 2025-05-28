@@ -58,15 +58,25 @@ func (d DynamoDBService) GetAllPosts(pageSize int32, startKey map[string]types.A
 		return posts, "", err
 	}
 
-	// TODO: fix start key issues
 	var nextStartKey string
 	if result.LastEvaluatedKey != nil {
-		marshaledKey, err := attributevalue.MarshalMap(result.LastEvaluatedKey)
-		if err == nil {
-			startKeyJson, _ := json.Marshal(marshaledKey)
-			encodedStartKey := base64.StdEncoding.EncodeToString(startKeyJson)
-			nextStartKey = encodedStartKey
+		// Convert raw AttributeValues to an intermediate JSON-safe map
+		jsonFriendlyKey := make(map[string]map[string]string)
+		for k, v := range result.LastEvaluatedKey {
+			switch attr := v.(type) {
+			case *types.AttributeValueMemberS:
+				jsonFriendlyKey[k] = map[string]string{"S": attr.Value}
+			case *types.AttributeValueMemberN:
+				jsonFriendlyKey[k] = map[string]string{"N": attr.Value}
+			default:
+				continue
+			}
 		}
+
+		// Encode in JSON, then base64
+		startKeyJson, _ := json.Marshal(jsonFriendlyKey)
+		encodedStartKey := base64.StdEncoding.EncodeToString(startKeyJson)
+		nextStartKey = encodedStartKey
 	}
 
 	return posts, nextStartKey, nil
