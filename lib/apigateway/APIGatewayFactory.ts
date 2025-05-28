@@ -31,6 +31,7 @@ export class APIGatewayFactory {
     private loadRoutes(): void {
         const {
             createPostLambda,
+            updatePostLambda,
             getPostByIdLambda,
             getAllPostsLambda,
         } = this.stack.lambdas;
@@ -41,16 +42,7 @@ export class APIGatewayFactory {
             integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
                 'CreatePostIntegration',
                 createPostLambda,
-            )
-        });
-
-        this.gateway.addRoutes({
-            path: '/api/v1/posts/{post_id}',
-            methods: [aws_apigatewayv2.HttpMethod.GET],
-            integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
-                'GetPostByIdIntegration',
-                getPostByIdLambda,
-            )
+            ),
         });
 
         this.gateway.addRoutes({
@@ -59,7 +51,25 @@ export class APIGatewayFactory {
             integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
                 'GetAllPostsIntegration',
                 getAllPostsLambda,
-            )
+            ),
+        });
+
+        this.gateway.addRoutes({
+            path: '/api/v1/posts/{post_id}',
+            methods: [aws_apigatewayv2.HttpMethod.PUT],
+            integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
+                'UpdatePostIntegration',
+                updatePostLambda,
+            ),
+        });
+
+        this.gateway.addRoutes({
+            path: '/api/v1/posts/{post_id}',
+            methods: [aws_apigatewayv2.HttpMethod.GET],
+            integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
+                'GetPostByIdIntegration',
+                getPostByIdLambda,
+            ),
         });
     }
 }

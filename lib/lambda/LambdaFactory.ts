@@ -11,6 +11,7 @@ export class LambdaFactory {
 
         this.lambdas = {
             createPostLambda: this.makeCreatePostLambda(),
+            updatePostLambda: this.makeUpdatePostLambda(),
             getPostByIdLambda: this.makeGetPostByIdLambda(),
             getAllPostsLambda: this.makeGetAllPostsLambda(),
         };
@@ -22,6 +23,20 @@ export class LambdaFactory {
             runtime: lambda.Runtime.PROVIDED_AL2023,
             timeout: cdk.Duration.seconds(30),
             code: lambda.Code.fromAsset('src/api/post/create/build'),
+            handler: 'bootstrap',
+            environment: {
+                'S3_BUCKET_NAME': this.stack.bucket.bucketName,
+                'POST_METADATA_TABLE_NAME': this.stack.table.tableName,
+            },
+        });
+    }
+
+    private makeUpdatePostLambda(): lambda.Function {
+        return new lambda.Function(this.stack, 'UpdatePost', {
+            functionName: `${this.stack.stackName}-UpdatePost`,
+            runtime: lambda.Runtime.PROVIDED_AL2023,
+            timeout: cdk.Duration.seconds(30),
+            code: lambda.Code.fromAsset('src/api/post/update/build'),
             handler: 'bootstrap',
             environment: {
                 'S3_BUCKET_NAME': this.stack.bucket.bucketName,

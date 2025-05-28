@@ -31,10 +31,13 @@ export class S3Factory {
     public grantPermissions(): void {
         const {
             createPostLambda,
+            updatePostLambda,
             getPostByIdLambda,
         } = this.stack.lambdas;
 
         this.bucket.grantWrite(createPostLambda);
+        this.bucket.grantWrite(updatePostLambda);
+
         this.bucket.grantRead(getPostByIdLambda);
     }
 
