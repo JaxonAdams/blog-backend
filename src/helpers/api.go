@@ -66,6 +66,25 @@ func ParseGetPostsInput(request events.APIGatewayProxyRequest) (models.GetPostsI
 	}, nil
 }
 
+func ParseUpdatePostInput(request events.APIGatewayProxyRequest) (models.UpdatePostInput, error) {
+	var input models.UpdatePostInput
+
+	err := json.Unmarshal([]byte(request.Body), &input)
+	if err != nil {
+		return models.UpdatePostInput{}, err
+	}
+
+	pathParams := request.PathParameters
+
+	id, exists := pathParams["post_id"]
+	if !exists {
+		return models.UpdatePostInput{}, fmt.Errorf("post_id path param is required")
+	}
+	input.ID = id
+
+	return input, nil
+}
+
 func MakeSuccessResponse(statusCode int, data any) events.APIGatewayProxyResponse {
 	response := map[string]any{
 		"data": data,

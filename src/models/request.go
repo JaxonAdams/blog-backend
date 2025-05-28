@@ -16,3 +16,8 @@ type GetPostsInput struct {
 	PageSize int
 	StartKey map[string]types.AttributeValue
 }
+
+type UpdatePostInput struct {
+	GetPostByIdInput
+	CreatePostInput
+}
