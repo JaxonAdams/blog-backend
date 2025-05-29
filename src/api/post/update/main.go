@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/JaxonAdams/blog-backend/src/helpers"
 	"github.com/JaxonAdams/blog-backend/src/models"
@@ -13,6 +14,13 @@ import (
 
 func createRequestHandler(services models.HandlerServices) func(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	return func(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+		parsedRequest, err := helpers.ParseUpdatePostInput(request)
+		if err != nil {
+			return helpers.MakeErrorResponse(400, map[string]string{"message": err.Error()}), nil
+		}
+
+		fmt.Printf("Parsed request: %+v", parsedRequest)
+
 		return helpers.MakeSuccessResponse(200, map[string]any{"message": "Hello, world!"}), nil
 	}
 }
