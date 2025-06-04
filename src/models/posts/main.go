@@ -29,3 +29,15 @@ func (p Post) DynamoFormat() map[string]types.AttributeValue {
 		"modifiedAt":  &types.AttributeValueMemberN{Value: fmt.Sprintf("%d", p.ModifiedAt)},
 	}
 }
+
+type PartialPostUpdate struct {
+	ID          string    `json:"id" validate:"required"`
+	Title       *string   `json:"title" validate:"required"`
+	Tags        *[]string `json:"tags"`
+	HtmlPostUrl string    `json:"html_post_url,omitempty" dynamodbav:"html_post_url,omitempty"`
+	MdPostUrl   string    `json:"md_post_url,omitempty" dynamodbav:"md_post_url,omitempty"`
+	HtmlS3Key   string    `json:"html_s3_key" dynamodbav:"html_s3_key"`
+	MdS3Key     string    `json:"md_s3_key" dynamodbav:"md_s3_key"`
+	CreatedAt   int64     `json:"created_at" validate:"required"`
+	ModifiedAt  int64     `json:"modified_at" validate:"required"`
+}
