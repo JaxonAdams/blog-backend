@@ -61,6 +61,9 @@ func UpdatePost(input models.UpdatePostInput, services models.HandlerServices, c
 
 	post := origPost
 
+	post.HtmlPostUrl = ""
+	post.MdPostUrl = ""
+
 	if input.Title != nil {
 		post.Title = *input.Title
 	}
@@ -89,10 +92,6 @@ func UpdatePost(input models.UpdatePostInput, services models.HandlerServices, c
 
 		post.HtmlS3Key = htmlS3Key
 		post.MdS3Key = mdS3Key
-
-		// The previous signed URLs are now invalid
-		post.HtmlPostUrl = ""
-		post.MdPostUrl = ""
 
 	}
 
