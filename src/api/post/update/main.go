@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"github.com/JaxonAdams/blog-backend/src/helpers"
 	"github.com/JaxonAdams/blog-backend/src/models"
+	postservice "github.com/JaxonAdams/blog-backend/src/services"
 	"github.com/JaxonAdams/blog-backend/src/services/aws/dynamodb"
 	"github.com/JaxonAdams/blog-backend/src/services/aws/s3"
 	"github.com/aws/aws-lambda-go/events"
@@ -19,9 +20,16 @@ func createRequestHandler(services models.HandlerServices) func(ctx context.Cont
 			return helpers.MakeErrorResponse(400, map[string]string{"message": err.Error()}), nil
 		}
 
-		fmt.Printf("Parsed request: %+v", parsedRequest)
+		post, err := postservice.UpdatePost(parsedRequest, services, ctx)
+		if err != nil {
+			var notFoundErr dynamodb.ErrCodeNotFound
+			if errors.As(err, &notFoundErr) {
+				return helpers.MakeErrorResponse(404, map[string]string{"message": "Not found"}), nil
+			}
+			return helpers.MakeErrorResponse(500, map[string]string{"message": err.Error()}), nil
+		}
 
-		return helpers.MakeSuccessResponse(200, map[string]any{"message": "Hello, world!"}), nil
+		return helpers.MakeSuccessResponse(200, map[string]any{"post": post}), nil
 	}
 }
 

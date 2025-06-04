@@ -19,5 +19,7 @@ type GetPostsInput struct {
 
 type UpdatePostInput struct {
 	GetPostByIdInput
-	CreatePostInput
+	Title   *string   `json:"title" validate:"required"`
+	Tags    *[]string `json:"tags"`
+	Content *string   `json:"content" validate:"required"`
 }

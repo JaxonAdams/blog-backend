@@ -44,7 +44,56 @@ func CreatePost(input models.CreatePostInput, services models.HandlerServices, c
 	}
 
 	// Store metadata in DynamoDB, including S3 key
-	err = services.DynamoDBService.PutNewPost(post, ctx)
+	err = services.DynamoDBService.UpsertPost(post, ctx)
+	if err != nil {
+		log.Fatalf("failed to store post metadata in dynamo: %v", err)
+		return postmodel.Post{}, err
+	}
+
+	return post, nil
+}
+
+func UpdatePost(input models.UpdatePostInput, services models.HandlerServices, ctx context.Context) (postmodel.Post, error) {
+	origPost, err := GetPostByID(input.ID, services, ctx)
+	if err != nil {
+		return postmodel.Post{}, err
+	}
+
+	post := origPost
+
+	if input.Title != nil {
+		post.Title = *input.Title
+	}
+
+	if input.Tags != nil {
+		post.Tags = *input.Tags
+	}
+
+	if input.Content != nil {
+		// Convert the markdown to HTML
+		html := markdown.MdToHTML([]byte(*input.Content))
+		fmt.Printf("HTML Content: %s", html)
+
+		// Store the HTML and Markdown in S3
+		htmlS3Key, err := services.S3Service.UploadPostHTML(post.ID, string(html), ctx)
+		if err != nil {
+			log.Fatalf("failed to upload md to s3: %v", err)
+			return postmodel.Post{}, err
+		}
+
+		mdS3Key, err := services.S3Service.UploadPostMd(post.ID, *input.Content, ctx)
+		if err != nil {
+			log.Fatalf("failed to upload html to s3: %v", err)
+			return postmodel.Post{}, err
+		}
+
+		post.HtmlS3Key = htmlS3Key
+		post.MdS3Key = mdS3Key
+	}
+
+	post.ModifiedAt = time.Now().UnixMilli()
+
+	err = services.DynamoDBService.UpsertPost(post, ctx)
 	if err != nil {
 		log.Fatalf("failed to store post metadata in dynamo: %v", err)
 		return postmodel.Post{}, err

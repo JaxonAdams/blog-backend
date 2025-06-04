@@ -32,7 +32,7 @@ func New(ctx context.Context) *DynamoDBService {
 	}
 }
 
-func (d DynamoDBService) PutNewPost(post postmodel.Post, ctx context.Context) error {
+func (d DynamoDBService) UpsertPost(post postmodel.Post, ctx context.Context) error {
 	table := os.Getenv("POST_METADATA_TABLE_NAME")
 	item := post.DynamoFormat()
 
