@@ -89,6 +89,11 @@ func UpdatePost(input models.UpdatePostInput, services models.HandlerServices, c
 
 		post.HtmlS3Key = htmlS3Key
 		post.MdS3Key = mdS3Key
+
+		// The previous signed URLs are now invalid
+		post.HtmlPostUrl = ""
+		post.MdPostUrl = ""
+
 	}
 
 	post.ModifiedAt = time.Now().UnixMilli()
