@@ -39,16 +39,6 @@ func (d DynamoDBService) UpsertPost(post postmodel.Post, ctx context.Context) er
 	return d.putItem(table, item, ctx)
 }
 
-func (d DynamoDBService) UpdatePost(post *postmodel.PartialPostUpdate, ctx context.Context) error {
-	table := os.Getenv("POST_METADATA_TABLE_NAME")
-	input, err := buildUpdateInput(table, post)
-	if err != nil {
-		return err
-	}
-
-	return d.updateItem(input, ctx)
-}
-
 func (d DynamoDBService) GetAllPosts(pageSize int32, startKey map[string]types.AttributeValue, ctx context.Context) ([]postmodel.Post, string, error) {
 	table := os.Getenv("POST_METADATA_TABLE_NAME")
 	input := &dynamodb.ScanInput{
@@ -147,103 +137,6 @@ func (d DynamoDBService) updateItem(input *dynamodb.UpdateItemInput, ctx context
 
 	log.Println("Post successfully stored in DynamoDB")
 	return nil
-}
-
-func buildUpdateInput(tableName string, post *postmodel.PartialPostUpdate) (*dynamodb.UpdateItemInput, error) {
-	if post.ID == "" {
-		return nil, fmt.Errorf("missing ID")
-	}
-
-	exprAttrValues := map[string]types.AttributeValue{}
-	exprAttrNames := map[string]string{}
-	updateExprParts := []string{}
-
-	// Optional fields
-	hasOptionalUpdates := addOptionalFieldUpdates(post, &updateExprParts, exprAttrValues, exprAttrNames)
-
-	// Always-updated fields
-	addAlwaysUpdatedFields(post, &updateExprParts, exprAttrValues, exprAttrNames)
-
-	// Combine update expressions
-	updateExpr := "SET " + joinUpdateExpr(updateExprParts)
-
-	if !hasOptionalUpdates {
-		log.Println("No optional fields provided; updating only default fields.")
-	}
-
-	return &dynamodb.UpdateItemInput{
-		TableName:                 aws.String(tableName),
-		Key:                       map[string]types.AttributeValue{"id": &types.AttributeValueMemberS{Value: post.ID}},
-		UpdateExpression:          aws.String(updateExpr),
-		ExpressionAttributeValues: exprAttrValues,
-		ExpressionAttributeNames:  exprAttrNames,
-		ReturnValues:              types.ReturnValueAllNew,
-	}, nil
-}
-
-func addOptionalFieldUpdates(post *postmodel.PartialPostUpdate, updateExprParts *[]string, exprAttrValues map[string]types.AttributeValue, exprAttrNames map[string]string) bool {
-	hasUpdate := false
-
-	if post.Title != nil {
-		*updateExprParts = append(*updateExprParts, "#title = :title")
-		exprAttrValues[":title"] = &types.AttributeValueMemberS{Value: *post.Title}
-		exprAttrNames["#title"] = "title"
-		hasUpdate = true
-	}
-
-	if post.Tags != nil {
-		tagList := make([]types.AttributeValue, len(*post.Tags))
-		for i, t := range *post.Tags {
-			tagList[i] = &types.AttributeValueMemberS{Value: t}
-		}
-		*updateExprParts = append(*updateExprParts, "#tags = :tags")
-		exprAttrValues[":tags"] = &types.AttributeValueMemberL{Value: tagList}
-		exprAttrNames["#tags"] = "tags"
-		hasUpdate = true
-	}
-
-	return hasUpdate
-}
-
-func addAlwaysUpdatedFields(post *postmodel.PartialPostUpdate, updateExprParts *[]string, exprAttrValues map[string]types.AttributeValue, exprAttrNames map[string]string) {
-	*updateExprParts = append(*updateExprParts, "#htmlPostUrl = :htmlPostUrl")
-	exprAttrValues[":htmlPostUrl"] = &types.AttributeValueMemberS{Value: post.HtmlPostUrl}
-	exprAttrNames["#htmlPostUrl"] = "html_post_url"
-
-	*updateExprParts = append(*updateExprParts, "#mdPostUrl = :mdPostUrl")
-	exprAttrValues[":mdPostUrl"] = &types.AttributeValueMemberS{Value: post.MdPostUrl}
-	exprAttrNames["#mdPostUrl"] = "md_post_url"
-
-	*updateExprParts = append(*updateExprParts, "#htmlS3Key = :htmlS3Key")
-	exprAttrValues[":htmlS3Key"] = &types.AttributeValueMemberS{Value: post.HtmlS3Key}
-	exprAttrNames["#htmlS3Key"] = "html_s3_key"
-
-	*updateExprParts = append(*updateExprParts, "#mdS3Key = :mdS3Key")
-	exprAttrValues[":mdS3Key"] = &types.AttributeValueMemberS{Value: post.MdS3Key}
-	exprAttrNames["#mdS3Key"] = "md_s3_key"
-
-	*updateExprParts = append(*updateExprParts, "#createdAt = :createdAt")
-	exprAttrValues[":createdAt"] = &types.AttributeValueMemberN{Value: fmt.Sprintf("%d", post.CreatedAt)}
-	exprAttrNames["#createdAt"] = "created_at"
-
-	*updateExprParts = append(*updateExprParts, "#modifiedAt = :modifiedAt")
-	exprAttrValues[":modifiedAt"] = &types.AttributeValueMemberN{Value: fmt.Sprintf("%d", post.ModifiedAt)}
-	exprAttrNames["#modifiedAt"] = "modified_at"
-}
-
-func joinUpdateExpr(parts []string) string {
-	return joinStrings(parts, ", ")
-}
-
-func joinStrings(slice []string, sep string) string {
-	if len(slice) == 0 {
-		return ""
-	}
-	result := slice[0]
-	for _, s := range slice[1:] {
-		result += sep + s
-	}
-	return result
 }
 
 type ErrCodeNotFound struct {
