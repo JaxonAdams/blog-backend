@@ -1,75 +1,75 @@
-import * as cdk from 'aws-cdk-lib';
-import * as aws_apigatewayv2 from 'aws-cdk-lib/aws-apigatewayv2';
-import { BlogBackendStack } from '../blog-backend-stack';
+import * as cdk from "aws-cdk-lib";
+import * as aws_apigatewayv2 from "aws-cdk-lib/aws-apigatewayv2";
+import { BlogBackendStack } from "../blog-backend-stack";
 
 export class APIGatewayFactory {
-    private stack: BlogBackendStack;
-    private gateway: aws_apigatewayv2.HttpApi;
+  private stack: BlogBackendStack;
+  private gateway: aws_apigatewayv2.HttpApi;
 
-    constructor(stack: BlogBackendStack) {
-        this.stack = stack;
-        this.gateway = this.makeHttpApi();
+  constructor(stack: BlogBackendStack) {
+    this.stack = stack;
+    this.gateway = this.makeHttpApi();
 
-        this.loadRoutes();
-        this.makeCfnOutputs();
-    }
+    this.loadRoutes();
+    this.makeCfnOutputs();
+  }
 
-    private makeHttpApi(): aws_apigatewayv2.HttpApi {
-        return new aws_apigatewayv2.HttpApi(this.stack, 'HttpApi', {
-            apiName: this.stack.stackName,
-        });
-    }
+  private makeHttpApi(): aws_apigatewayv2.HttpApi {
+    return new aws_apigatewayv2.HttpApi(this.stack, "HttpApi", {
+      apiName: this.stack.stackName,
+    });
+  }
 
-    private makeCfnOutputs(): void {
-        new cdk.CfnOutput(this.stack, 'HttpApiUrlReference', {
-            exportName: `${this.stack.stackName}-HttpApiUrl`,
-            value: this.gateway.apiEndpoint,
-            description: 'HTTP API URL',
-        });
-    }
+  private makeCfnOutputs(): void {
+    new cdk.CfnOutput(this.stack, "HttpApiUrlReference", {
+      exportName: `${this.stack.stackName}-HttpApiUrl`,
+      value: this.gateway.apiEndpoint,
+      description: "HTTP API URL",
+    });
+  }
 
-    private loadRoutes(): void {
-        const {
-            createPostLambda,
-            updatePostLambda,
-            getPostByIdLambda,
-            getAllPostsLambda,
-        } = this.stack.lambdas;
+  private loadRoutes(): void {
+    const {
+      createPostLambda,
+      updatePostLambda,
+      getPostByIdLambda,
+      getAllPostsLambda,
+    } = this.stack.lambdas;
 
-        this.gateway.addRoutes({
-            path: '/api/v1/posts',
-            methods: [aws_apigatewayv2.HttpMethod.POST],
-            integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
-                'CreatePostIntegration',
-                createPostLambda,
-            ),
-        });
+    this.gateway.addRoutes({
+      path: "/api/v1/posts",
+      methods: [aws_apigatewayv2.HttpMethod.POST],
+      integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
+        "CreatePostIntegration",
+        createPostLambda,
+      ),
+    });
 
-        this.gateway.addRoutes({
-            path: '/api/v1/posts',
-            methods: [aws_apigatewayv2.HttpMethod.GET],
-            integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
-                'GetAllPostsIntegration',
-                getAllPostsLambda,
-            ),
-        });
+    this.gateway.addRoutes({
+      path: "/api/v1/posts",
+      methods: [aws_apigatewayv2.HttpMethod.GET],
+      integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
+        "GetAllPostsIntegration",
+        getAllPostsLambda,
+      ),
+    });
 
-        this.gateway.addRoutes({
-            path: '/api/v1/posts/{post_id}',
-            methods: [aws_apigatewayv2.HttpMethod.PUT],
-            integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
-                'UpdatePostIntegration',
-                updatePostLambda,
-            ),
-        });
+    this.gateway.addRoutes({
+      path: "/api/v1/posts/{post_id}",
+      methods: [aws_apigatewayv2.HttpMethod.PUT],
+      integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
+        "UpdatePostIntegration",
+        updatePostLambda,
+      ),
+    });
 
-        this.gateway.addRoutes({
-            path: '/api/v1/posts/{post_id}',
-            methods: [aws_apigatewayv2.HttpMethod.GET],
-            integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
-                'GetPostByIdIntegration',
-                getPostByIdLambda,
-            ),
-        });
-    }
+    this.gateway.addRoutes({
+      path: "/api/v1/posts/{post_id}",
+      methods: [aws_apigatewayv2.HttpMethod.GET],
+      integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
+        "GetPostByIdIntegration",
+        getPostByIdLambda,
+      ),
+    });
+  }
 }
