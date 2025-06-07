@@ -14,6 +14,7 @@ export class LambdaFactory {
       updatePostLambda: this.makeUpdatePostLambda(),
       getPostByIdLambda: this.makeGetPostByIdLambda(),
       getAllPostsLambda: this.makeGetAllPostsLambda(),
+      deletePostLambda: this.makeDeletePostLambda(),
     };
   }
 
@@ -70,6 +71,19 @@ export class LambdaFactory {
       environment: {
         POST_METADATA_TABLE_NAME: this.stack.table.tableName,
         DEFAULT_PAGE_SIZE: "20",
+      },
+    });
+  }
+
+  private makeDeletePostLambda(): lambda.Function {
+    return new lambda.Function(this.stack, "DeletePost", {
+      functionName: `${this.stack.stackName}-DeletePost`,
+      runtime: lambda.Runtime.PROVIDED_AL2023,
+      timeout: cdk.Duration.seconds(30),
+      code: lambda.Code.fromAsset("src/api/post/delete/build"),
+      handler: "bootstrap",
+      environment: {
+        POST_METADATA_TABLE_NAME: this.stack.table.tableName,
       },
     });
   }
