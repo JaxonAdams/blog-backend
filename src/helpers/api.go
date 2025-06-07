@@ -24,6 +24,10 @@ func ParseCreatePostInput(request events.APIGatewayProxyRequest) (models.CreateP
 		return models.CreatePostInput{}, fmt.Errorf("fields title and content are required")
 	}
 
+	if len(input.Tags) == 0 {
+		return models.CreatePostInput{}, fmt.Errorf("at least one tag is required")
+	}
+
 	return input, nil
 }
 

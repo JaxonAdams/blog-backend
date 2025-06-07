@@ -129,16 +129,6 @@ func (d DynamoDBService) putItem(tableName string, item map[string]types.Attribu
 	return nil
 }
 
-func (d DynamoDBService) updateItem(input *dynamodb.UpdateItemInput, ctx context.Context) error {
-	_, err := d.client.UpdateItem(ctx, input)
-	if err != nil {
-		return err
-	}
-
-	log.Println("Post successfully stored in DynamoDB")
-	return nil
-}
-
 type ErrCodeNotFound struct {
 	Msg string
 }

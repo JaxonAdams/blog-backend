@@ -70,6 +70,9 @@ func UpdatePost(input models.UpdatePostInput, services models.HandlerServices, c
 
 	if input.Tags != nil {
 		post.Tags = *input.Tags
+		if len(post.Tags) == 0 {
+			return postmodel.Post{}, ErrCodeInvalidRequest{Msg: "at least one tag is required"}
+		}
 	}
 
 	if input.Content != nil {
@@ -148,4 +151,12 @@ func getPresignedUrlsForPost(post postmodel.Post, services models.HandlerService
 	}
 
 	return htmlPresignedURL, mdPresignedURL, nil
+}
+
+type ErrCodeInvalidRequest struct {
+	Msg string
+}
+
+func (e ErrCodeInvalidRequest) Error() string {
+	return e.Msg
 }

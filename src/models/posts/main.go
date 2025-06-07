@@ -9,7 +9,7 @@ import (
 type Post struct {
 	ID          string   `json:"id" validate:"required"`
 	Title       string   `json:"title" validate:"required"`
-	Tags        []string `json:"tags"`
+	Tags        []string `json:"tags" validate:"required"`
 	HtmlPostUrl string   `json:"html_post_url,omitempty" dynamodbav:"html_post_url,omitempty"`
 	MdPostUrl   string   `json:"md_post_url,omitempty" dynamodbav:"md_post_url,omitempty"`
 	HtmlS3Key   string   `json:"html_s3_key" dynamodbav:"html_s3_key"`

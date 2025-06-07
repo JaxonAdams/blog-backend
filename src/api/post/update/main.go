@@ -26,6 +26,12 @@ func createRequestHandler(services models.HandlerServices) func(ctx context.Cont
 			if errors.As(err, &notFoundErr) {
 				return helpers.MakeErrorResponse(404, map[string]string{"message": "Not found"}), nil
 			}
+
+			var invalidRequestErr postservice.ErrCodeInvalidRequest
+			if errors.As(err, &invalidRequestErr) {
+				return helpers.MakeErrorResponse(400, map[string]string{"message": err.Error()}), nil
+			}
+
 			return helpers.MakeErrorResponse(500, map[string]string{"message": err.Error()}), nil
 		}
 
