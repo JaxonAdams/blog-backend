@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	postmodel "github.com/JaxonAdams/blog-backend/src/models/posts"
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -40,9 +41,9 @@ func (d DynamoDBService) UpsertPost(post postmodel.Post, ctx context.Context) er
 	return d.putItem(table, item, ctx)
 }
 
-func (d DynamoDBService) DeletePost(postId string, ctx context.Context) error {
+func (d DynamoDBService) DeletePost(postId string, createdAt int, ctx context.Context) error {
 	table := os.Getenv("POST_METADATA_TABLE_NAME")
-	return d.deleteItem(table, postId, ctx)
+	return d.deleteItem(table, postId, createdAt, ctx)
 }
 
 func (d DynamoDBService) GetAllPosts(pageSize int32, startKey map[string]types.AttributeValue, ctx context.Context) ([]postmodel.Post, string, error) {
@@ -135,11 +136,12 @@ func (d DynamoDBService) putItem(tableName string, item map[string]types.Attribu
 	return nil
 }
 
-func (d DynamoDBService) deleteItem(tableName, itemId string, ctx context.Context) error {
+func (d DynamoDBService) deleteItem(tableName, itemId string, itemCreatedAt int, ctx context.Context) error {
 	input := &dynamodb.DeleteItemInput{
 		TableName: aws.String(tableName),
 		Key: map[string]types.AttributeValue{
-			"id": &types.AttributeValueMemberS{Value: itemId},
+			"id":        &types.AttributeValueMemberS{Value: itemId},
+			"createdAt": &types.AttributeValueMemberN{Value: strconv.Itoa(itemCreatedAt)},
 		},
 		ConditionExpression: aws.String("attribute_exists(id)"),
 	}
