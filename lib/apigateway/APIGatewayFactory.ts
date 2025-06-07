@@ -34,6 +34,7 @@ export class APIGatewayFactory {
       updatePostLambda,
       getPostByIdLambda,
       getAllPostsLambda,
+      deletePostLambda,
     } = this.stack.lambdas;
 
     this.gateway.addRoutes({
@@ -56,7 +57,7 @@ export class APIGatewayFactory {
 
     this.gateway.addRoutes({
       path: "/api/v1/posts/{post_id}",
-      methods: [aws_apigatewayv2.HttpMethod.PUT],
+      methods: [aws_apigatewayv2.HttpMethod.PATCH],
       integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
         "UpdatePostIntegration",
         updatePostLambda,
@@ -69,6 +70,15 @@ export class APIGatewayFactory {
       integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
         "GetPostByIdIntegration",
         getPostByIdLambda,
+      ),
+    });
+
+    this.gateway.addRoutes({
+      path: "/api/v1/posts/{post_id}",
+      methods: [aws_apigatewayv2.HttpMethod.DELETE],
+      integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
+        "DeletePostIntegration",
+        deletePostLambda,
       ),
     });
   }

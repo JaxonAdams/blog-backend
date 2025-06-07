@@ -41,6 +41,7 @@ export class DynamoDBFactory {
       updatePostLambda,
       getPostByIdLambda,
       getAllPostsLambda,
+      deletePostLambda,
     } = this.stack.lambdas;
 
     this.table.grantWriteData(createPostLambda);
@@ -49,6 +50,7 @@ export class DynamoDBFactory {
     this.table.grantReadData(getAllPostsLambda);
 
     this.table.grantReadWriteData(updatePostLambda);
+    this.table.grantReadWriteData(deletePostLambda);
   }
 
   public getTable(): dynamodb.TableV2 {
