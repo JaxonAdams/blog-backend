@@ -140,7 +140,13 @@ func GetAllPosts(input models.GetPostsInput, services models.HandlerServices, ct
 }
 
 func DeletePost(id string, services models.HandlerServices, ctx context.Context) error {
-	return services.DynamoDBService.DeletePost(id, ctx)
+	post, err := services.DynamoDBService.GetPostById(id, ctx)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Attempting to delete post with ID %s", id)
+	return services.DynamoDBService.DeletePost(id, int(post.CreatedAt), ctx)
 }
 
 func getPresignedUrlsForPost(post postmodel.Post, services models.HandlerServices, ctx context.Context) (string, string, error) {
