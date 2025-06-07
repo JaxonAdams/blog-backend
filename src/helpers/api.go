@@ -89,6 +89,21 @@ func ParseUpdatePostInput(request events.APIGatewayProxyRequest) (models.UpdateP
 	return input, nil
 }
 
+func ParseDeletePostInput(request events.APIGatewayProxyRequest) (models.DeletePostInput, error) {
+	var input models.DeletePostInput
+
+	pathParams := request.PathParameters
+
+	id, exists := pathParams["post_id"]
+	if !exists {
+		return models.DeletePostInput{}, fmt.Errorf("post_id path param is required")
+	}
+
+	input.ID = id
+
+	return input, nil
+}
+
 func MakeSuccessResponse(statusCode int, data any) events.APIGatewayProxyResponse {
 	response := map[string]any{
 		"data": data,

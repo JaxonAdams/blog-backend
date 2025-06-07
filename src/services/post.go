@@ -139,6 +139,10 @@ func GetAllPosts(input models.GetPostsInput, services models.HandlerServices, ct
 	return posts, metadata, nil
 }
 
+func DeletePost(id string, services models.HandlerServices, ctx context.Context) error {
+	return services.DynamoDBService.DeletePost(id, ctx)
+}
+
 func getPresignedUrlsForPost(post postmodel.Post, services models.HandlerServices, ctx context.Context) (string, string, error) {
 	htmlPresignedURL, err := services.S3Service.GetPostHtmlURL(post, ctx)
 	if err != nil {

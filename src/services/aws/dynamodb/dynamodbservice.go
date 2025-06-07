@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -37,6 +38,11 @@ func (d DynamoDBService) UpsertPost(post postmodel.Post, ctx context.Context) er
 	item := post.DynamoFormat()
 
 	return d.putItem(table, item, ctx)
+}
+
+func (d DynamoDBService) DeletePost(postId string, ctx context.Context) error {
+	table := os.Getenv("POST_METADATA_TABLE_NAME")
+	return d.deleteItem(table, postId, ctx)
 }
 
 func (d DynamoDBService) GetAllPosts(pageSize int32, startKey map[string]types.AttributeValue, ctx context.Context) ([]postmodel.Post, string, error) {
@@ -126,6 +132,28 @@ func (d DynamoDBService) putItem(tableName string, item map[string]types.Attribu
 	}
 
 	log.Println("Post successfully stored in DynamoDB")
+	return nil
+}
+
+func (d DynamoDBService) deleteItem(tableName, itemId string, ctx context.Context) error {
+	input := &dynamodb.DeleteItemInput{
+		TableName: aws.String(tableName),
+		Key: map[string]types.AttributeValue{
+			"id": &types.AttributeValueMemberS{Value: itemId},
+		},
+		ConditionExpression: aws.String("attribute_exists(id)"),
+	}
+
+	_, err := d.client.DeleteItem(ctx, input)
+	if err != nil {
+		var cce *types.ConditionalCheckFailedException
+		if ok := errors.As(err, &cce); ok {
+			return ErrCodeNotFound{Msg: fmt.Sprintf("no post found with id %s", itemId)}
+		}
+		return fmt.Errorf("failed to delete post: %w", err)
+	}
+
+	log.Printf("Post with ID %s successfully deleted.", itemId)
 	return nil
 }
 

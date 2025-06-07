@@ -23,3 +23,7 @@ type UpdatePostInput struct {
 	Tags    *[]string `json:"tags" validate:"required"`
 	Content *string   `json:"content" validate:"required"`
 }
+
+type DeletePostInput struct {
+	GetPostByIdInput
+}
