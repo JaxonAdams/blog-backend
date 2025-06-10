@@ -15,6 +15,7 @@ export class LambdaFactory {
       getPostByIdLambda: this.makeGetPostByIdLambda(),
       getAllPostsLambda: this.makeGetAllPostsLambda(),
       deletePostLambda: this.makeDeletePostLambda(),
+      loginAdminLambda: this.makeLoginAdminLambda(),
     };
   }
 
@@ -27,7 +28,7 @@ export class LambdaFactory {
       handler: "bootstrap",
       environment: {
         S3_BUCKET_NAME: this.stack.bucket.bucketName,
-        POST_METADATA_TABLE_NAME: this.stack.table.tableName,
+        POST_METADATA_TABLE_NAME: this.stack.postTable.tableName,
       },
     });
   }
@@ -41,7 +42,7 @@ export class LambdaFactory {
       handler: "bootstrap",
       environment: {
         S3_BUCKET_NAME: this.stack.bucket.bucketName,
-        POST_METADATA_TABLE_NAME: this.stack.table.tableName,
+        POST_METADATA_TABLE_NAME: this.stack.postTable.tableName,
       },
     });
   }
@@ -56,7 +57,7 @@ export class LambdaFactory {
       environment: {
         S3_BUCKET_NAME: this.stack.bucket.bucketName,
         S3_URL_EXPIRY_SECONDS: "3600",
-        POST_METADATA_TABLE_NAME: this.stack.table.tableName,
+        POST_METADATA_TABLE_NAME: this.stack.postTable.tableName,
       },
     });
   }
@@ -69,7 +70,7 @@ export class LambdaFactory {
       code: lambda.Code.fromAsset("src/api/post/getall/build"),
       handler: "bootstrap",
       environment: {
-        POST_METADATA_TABLE_NAME: this.stack.table.tableName,
+        POST_METADATA_TABLE_NAME: this.stack.postTable.tableName,
         DEFAULT_PAGE_SIZE: "20",
       },
     });
@@ -83,7 +84,20 @@ export class LambdaFactory {
       code: lambda.Code.fromAsset("src/api/post/delete/build"),
       handler: "bootstrap",
       environment: {
-        POST_METADATA_TABLE_NAME: this.stack.table.tableName,
+        POST_METADATA_TABLE_NAME: this.stack.postTable.tableName,
+      },
+    });
+  }
+
+  private makeLoginAdminLambda(): lambda.Function {
+    return new lambda.Function(this.stack, "LoginAdmin", {
+      functionName: `${this.stack.stackName}-LoginAdmin`,
+      runtime: lambda.Runtime.PROVIDED_AL2023,
+      timeout: cdk.Duration.seconds(30),
+      code: lambda.Code.fromAsset("src/api/auth/login/admin/build"),
+      handler: "bootstrap",
+      environment: {
+        AUTH_TABLE_NAME: this.stack.authTable.tableName,
       },
     });
   }

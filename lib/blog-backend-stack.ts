@@ -10,7 +10,8 @@ import { DynamoDBFactory } from "./apigateway/dynamodb/DynamoDBFactory";
 export class BlogBackendStack extends cdk.Stack {
   public lambdas: ProjectLambdas;
   public bucket: s3.Bucket;
-  public table: dynamodb.TableV2;
+  public postTable: dynamodb.TableV2;
+  public authTable: dynamodb.TableV2;
 
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -21,7 +22,8 @@ export class BlogBackendStack extends cdk.Stack {
 
     // DynamoDB for storing post metadata
     const dynamodbFactory = new DynamoDBFactory(this);
-    this.table = dynamodbFactory.getTable();
+    this.postTable = dynamodbFactory.getPostTable();
+    this.authTable = dynamodbFactory.getAuthTable();
 
     // Lambdas for API functionality
     const lambdaFactory = new LambdaFactory(this);
