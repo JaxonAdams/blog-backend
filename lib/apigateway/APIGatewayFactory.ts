@@ -35,6 +35,7 @@ export class APIGatewayFactory {
       getPostByIdLambda,
       getAllPostsLambda,
       deletePostLambda,
+      loginAdminLambda,
     } = this.stack.lambdas;
 
     this.gateway.addRoutes({
@@ -79,6 +80,15 @@ export class APIGatewayFactory {
       integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
         "DeletePostIntegration",
         deletePostLambda,
+      ),
+    });
+
+    this.gateway.addRoutes({
+      path: "/api/v1/auth/login/admin",
+      methods: [aws_apigatewayv2.HttpMethod.POST],
+      integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
+        "LoginAdminIntegration",
+        loginAdminLambda,
       ),
     });
   }
