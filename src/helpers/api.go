@@ -104,6 +104,17 @@ func ParseDeletePostInput(request events.APIGatewayProxyRequest) (models.DeleteP
 	return input, nil
 }
 
+func ParseAdminLoginInput(request events.APIGatewayProxyRequest) (models.AdminLoginInput, error) {
+	var input models.AdminLoginInput
+
+	err := json.Unmarshal([]byte(request.Body), &input)
+	if err != nil {
+		return models.AdminLoginInput{}, err
+	}
+
+	return input, nil
+}
+
 func MakeSuccessResponse(statusCode int, data any) events.APIGatewayProxyResponse {
 	response := map[string]any{
 		"data": data,

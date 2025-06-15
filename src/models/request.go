@@ -27,3 +27,8 @@ type UpdatePostInput struct {
 type DeletePostInput struct {
 	GetPostByIdInput
 }
+
+type AdminLoginInput struct {
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}

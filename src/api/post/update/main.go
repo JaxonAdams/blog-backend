@@ -6,9 +6,9 @@ import (
 
 	"github.com/JaxonAdams/blog-backend/src/helpers"
 	"github.com/JaxonAdams/blog-backend/src/models"
-	postservice "github.com/JaxonAdams/blog-backend/src/services"
 	"github.com/JaxonAdams/blog-backend/src/services/aws/dynamodb"
 	"github.com/JaxonAdams/blog-backend/src/services/aws/s3"
+	postservice "github.com/JaxonAdams/blog-backend/src/services/post"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
