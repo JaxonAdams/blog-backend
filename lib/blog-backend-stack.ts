@@ -5,7 +5,7 @@ import { Construct } from "constructs";
 import { LambdaFactory, ProjectLambdas } from "./lambda/LambdaFactory";
 import { APIGatewayFactory } from "./apigateway/APIGatewayFactory";
 import { S3Factory } from "./s3/S3Factory";
-import { DynamoDBFactory } from "./apigateway/dynamodb/DynamoDBFactory";
+import { DynamoDBFactory } from "./dynamodb/DynamoDBFactory";
 
 export class BlogBackendStack extends cdk.Stack {
   public lambdas: ProjectLambdas;
