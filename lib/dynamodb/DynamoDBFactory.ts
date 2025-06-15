@@ -1,6 +1,6 @@
 import * as cdk from "aws-cdk-lib";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
-import { BlogBackendStack } from "../../blog-backend-stack";
+import { BlogBackendStack } from "../blog-backend-stack";
 
 export class DynamoDBFactory {
   private stack: BlogBackendStack;
