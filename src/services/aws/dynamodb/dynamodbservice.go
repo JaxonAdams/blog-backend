@@ -11,6 +11,7 @@ import (
 	"strconv"
 
 	postmodel "github.com/JaxonAdams/blog-backend/src/models/posts"
+	usermodel "github.com/JaxonAdams/blog-backend/src/models/users"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
@@ -119,6 +120,37 @@ func (d DynamoDBService) GetPostById(id string, ctx context.Context) (postmodel.
 	}
 
 	return post, nil
+}
+
+func (d DynamoDBService) GetAdminUser(username string, ctx context.Context) (usermodel.AdminUser, error) {
+	table := os.Getenv("AUTH_TABLE_NAME")
+
+	input := &dynamodb.QueryInput{
+		TableName:              aws.String(table),
+		KeyConditionExpression: aws.String("username = :username"),
+		ExpressionAttributeValues: map[string]types.AttributeValue{
+			":username": &types.AttributeValueMemberS{Value: username},
+		},
+		Limit: aws.Int32(1),
+	}
+
+	result, err := d.client.Query(ctx, input)
+	if err != nil {
+		return usermodel.AdminUser{}, nil
+	}
+
+	if len(result.Items) == 0 {
+		fmt.Printf("No users found with username %s", username)
+		return usermodel.AdminUser{}, ErrCodeNotFound{Msg: fmt.Sprintf("no user found with username %s", username)}
+	}
+
+	var user usermodel.AdminUser
+	err = attributevalue.UnmarshalMap(result.Items[0], &user)
+	if err != nil {
+		return usermodel.AdminUser{}, err
+	}
+
+	return user, nil
 }
 
 func (d DynamoDBService) putItem(tableName string, item map[string]types.AttributeValue, ctx context.Context) error {
