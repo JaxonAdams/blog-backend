@@ -19,16 +19,17 @@ func createRequestHandler(services models.HandlerServices) func(ctx context.Cont
 			return helpers.MakeErrorResponse(400, map[string]string{"message": err.Error()}), nil
 		}
 
-		_, err = loginservice.LogInAdmin(parsedRequest, services, ctx)
+		token, err := loginservice.LogInAdmin(parsedRequest, services, ctx)
 		if err != nil {
 			var notFoundErr dynamodb.ErrCodeNotFound
-			if errors.As(err, &notFoundErr) {
+			var unauthorizedError loginservice.ErrCodeUnauthorized
+			if errors.As(err, &notFoundErr) || errors.As(err, &unauthorizedError) {
 				return helpers.MakeErrorResponse(401, map[string]string{"message": "Unauthorized"}), nil
 			}
 			return helpers.MakeErrorResponse(500, map[string]string{"message": err.Error()}), nil
 		}
 
-		return helpers.MakeSuccessResponse(200, map[string]any{"message": "Hello, world!"}), nil
+		return helpers.MakeSuccessResponse(200, map[string]any{"token": token}), nil
 	}
 }
 

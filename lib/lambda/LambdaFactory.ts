@@ -98,6 +98,7 @@ export class LambdaFactory {
       handler: "bootstrap",
       environment: {
         AUTH_TABLE_NAME: this.stack.authTable.tableName,
+        JWT_SECRET: process.env.JWT_SECRET || "",
       },
     });
   }
