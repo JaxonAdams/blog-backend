@@ -12,6 +12,22 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
 
+func UserHasAdminRole(request events.APIGatewayProxyRequest) bool {
+	lambdaCtx, ok := request.RequestContext.Authorizer["lambda"]
+	if !ok || lambdaCtx == nil {
+		return false
+	}
+
+	roleValue, ok := lambdaCtx.(map[string]any)["role"]
+
+	role, ok := roleValue.(string)
+	if !ok {
+		return false
+	}
+
+	return role == "admin"
+}
+
 func ParseCreatePostInput(request events.APIGatewayProxyRequest) (models.CreatePostInput, error) {
 	var input models.CreatePostInput
 

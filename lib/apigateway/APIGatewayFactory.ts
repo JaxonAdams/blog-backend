@@ -29,6 +29,7 @@ export class APIGatewayFactory {
   }
 
   private loadRoutes(): void {
+    const authorizer = this.stack.authorizer;
     const {
       createPostLambda,
       updatePostLambda,
@@ -45,6 +46,7 @@ export class APIGatewayFactory {
         "CreatePostIntegration",
         createPostLambda,
       ),
+      authorizer,
     });
 
     this.gateway.addRoutes({
@@ -63,6 +65,7 @@ export class APIGatewayFactory {
         "UpdatePostIntegration",
         updatePostLambda,
       ),
+      authorizer,
     });
 
     this.gateway.addRoutes({
@@ -81,6 +84,7 @@ export class APIGatewayFactory {
         "DeletePostIntegration",
         deletePostLambda,
       ),
+      authorizer,
     });
 
     this.gateway.addRoutes({

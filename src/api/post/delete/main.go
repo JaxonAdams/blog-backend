@@ -14,6 +14,10 @@ import (
 
 func createRequestHandler(services models.HandlerServices) func(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	return func(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+		if !helpers.UserHasAdminRole(request) {
+			return helpers.MakeErrorResponse(403, map[string]string{"message": "Forbidden"}), nil
+		}
+
 		parsedRequest, err := helpers.ParseDeletePostInput(request)
 		if err != nil {
 			return helpers.MakeErrorResponse(400, map[string]string{"message": err.Error()}), nil

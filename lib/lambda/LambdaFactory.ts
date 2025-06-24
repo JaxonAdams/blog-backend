@@ -1,13 +1,16 @@
 import * as cdk from "aws-cdk-lib";
 import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as authorizers from "aws-cdk-lib/aws-apigatewayv2-authorizers";
 import { BlogBackendStack } from "../blog-backend-stack";
 
 export class LambdaFactory {
   private stack: BlogBackendStack;
+  private authorizer: authorizers.HttpLambdaAuthorizer;
   private lambdas: ProjectLambdas;
 
   constructor(stack: BlogBackendStack) {
     this.stack = stack;
+    this.authorizer = this.makeAuthorizerLambda();
 
     this.lambdas = {
       createPostLambda: this.makeCreatePostLambda(),
@@ -17,6 +20,27 @@ export class LambdaFactory {
       deletePostLambda: this.makeDeletePostLambda(),
       loginAdminLambda: this.makeLoginAdminLambda(),
     };
+  }
+
+  private makeAuthorizerLambda(): authorizers.HttpLambdaAuthorizer {
+    const lambdaFn = new lambda.Function(this.stack, "AuthorizerFunction", {
+      functionName: `${this.stack.stackName}-Authorizer`,
+      runtime: lambda.Runtime.PROVIDED_AL2023,
+      timeout: cdk.Duration.seconds(30),
+      handler: "main",
+      code: lambda.Code.fromAsset("src/api/auth/authorizer/build"),
+      environment: {
+        JWT_SECRET: process.env.JWT_SECRET || "",
+      },
+    });
+
+    return new authorizers.HttpLambdaAuthorizer(
+      "BlogLambdaAuthorizer",
+      lambdaFn,
+      {
+        responseTypes: [authorizers.HttpLambdaResponseType.SIMPLE],
+      },
+    );
   }
 
   private makeCreatePostLambda(): lambda.Function {
@@ -105,6 +129,10 @@ export class LambdaFactory {
 
   public getLambdas(): ProjectLambdas {
     return this.lambdas;
+  }
+
+  public getAuthorizer(): authorizers.HttpLambdaAuthorizer {
+    return this.authorizer;
   }
 }
 

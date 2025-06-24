@@ -1,6 +1,7 @@
 import * as cdk from "aws-cdk-lib";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import * as authorizers from "aws-cdk-lib/aws-apigatewayv2-authorizers";
 import { Construct } from "constructs";
 import { LambdaFactory, ProjectLambdas } from "./lambda/LambdaFactory";
 import { APIGatewayFactory } from "./apigateway/APIGatewayFactory";
@@ -8,6 +9,7 @@ import { S3Factory } from "./s3/S3Factory";
 import { DynamoDBFactory } from "./dynamodb/DynamoDBFactory";
 
 export class BlogBackendStack extends cdk.Stack {
+  public authorizer: authorizers.HttpLambdaAuthorizer;
   public lambdas: ProjectLambdas;
   public bucket: s3.Bucket;
   public postTable: dynamodb.TableV2;
@@ -27,6 +29,7 @@ export class BlogBackendStack extends cdk.Stack {
 
     // Lambdas for API functionality
     const lambdaFactory = new LambdaFactory(this);
+    this.authorizer = lambdaFactory.getAuthorizer();
     this.lambdas = lambdaFactory.getLambdas();
 
     // API Gateway for exposing lambdas
