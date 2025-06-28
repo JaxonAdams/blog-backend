@@ -26,7 +26,7 @@ export class APIGatewayFactory {
           aws_apigatewayv2.CorsHttpMethod.DELETE,
           aws_apigatewayv2.CorsHttpMethod.OPTIONS,
         ],
-        allowOrigins: ["*"], // TODO: restrict me
+        allowOrigins: ["http://localhost:3000"],
         maxAge: cdk.Duration.days(10),
       },
     });
