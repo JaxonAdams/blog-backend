@@ -19,7 +19,13 @@ export class APIGatewayFactory {
       apiName: this.stack.stackName,
       corsPreflight: {
         allowHeaders: ["Content-Type", "Authorization"],
-        allowMethods: [],
+        allowMethods: [
+          aws_apigatewayv2.CorsHttpMethod.GET,
+          aws_apigatewayv2.CorsHttpMethod.POST,
+          aws_apigatewayv2.CorsHttpMethod.PATCH,
+          aws_apigatewayv2.CorsHttpMethod.DELETE,
+          aws_apigatewayv2.CorsHttpMethod.OPTIONS,
+        ],
         allowOrigins: ["*"], // TODO: restrict me
         maxAge: cdk.Duration.days(10),
       },
