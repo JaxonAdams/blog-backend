@@ -17,6 +17,12 @@ export class APIGatewayFactory {
   private makeHttpApi(): aws_apigatewayv2.HttpApi {
     return new aws_apigatewayv2.HttpApi(this.stack, "HttpApi", {
       apiName: this.stack.stackName,
+      corsPreflight: {
+        allowHeaders: ["Content-Type", "Authorization"],
+        allowMethods: [],
+        allowOrigins: ["*"], // TODO: restrict me
+        maxAge: cdk.Duration.days(10),
+      },
     });
   }
 
