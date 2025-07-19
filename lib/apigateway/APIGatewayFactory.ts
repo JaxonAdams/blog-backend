@@ -26,7 +26,10 @@ export class APIGatewayFactory {
           aws_apigatewayv2.CorsHttpMethod.DELETE,
           aws_apigatewayv2.CorsHttpMethod.OPTIONS,
         ],
-        allowOrigins: ["http://localhost:3000"],
+        allowOrigins: [
+          "http://localhost:3000",
+          cdk.Fn.importValue("BlogFrontendStack-BlogURL"),
+        ],
         maxAge: cdk.Duration.days(10),
       },
     });
