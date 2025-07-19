@@ -9,6 +9,7 @@ import (
 type Post struct {
 	ID          string   `json:"id" validate:"required"`
 	Title       string   `json:"title" validate:"required"`
+	Summary     string   `json:"summary" validate:"required"`
 	Tags        []string `json:"tags" validate:"required"`
 	HtmlPostUrl string   `json:"html_post_url,omitempty" dynamodbav:"html_post_url,omitempty"`
 	MdPostUrl   string   `json:"md_post_url,omitempty" dynamodbav:"md_post_url,omitempty"`
@@ -22,6 +23,7 @@ func (p Post) DynamoFormat() map[string]types.AttributeValue {
 	return map[string]types.AttributeValue{
 		"id":          &types.AttributeValueMemberS{Value: p.ID},
 		"title":       &types.AttributeValueMemberS{Value: p.Title},
+		"summary":     &types.AttributeValueMemberS{Value: p.Summary},
 		"tags":        &types.AttributeValueMemberSS{Value: p.Tags},
 		"html_s3_key": &types.AttributeValueMemberS{Value: p.HtmlS3Key},
 		"md_s3_key":   &types.AttributeValueMemberS{Value: p.MdS3Key},
@@ -33,6 +35,7 @@ func (p Post) DynamoFormat() map[string]types.AttributeValue {
 type PartialPostUpdate struct {
 	ID          string    `json:"id" validate:"required"`
 	Title       *string   `json:"title" validate:"required"`
+	Summary     *string   `json:"summary" validate:"required"`
 	Tags        *[]string `json:"tags"`
 	HtmlPostUrl string    `json:"html_post_url,omitempty" dynamodbav:"html_post_url,omitempty"`
 	MdPostUrl   string    `json:"md_post_url,omitempty" dynamodbav:"md_post_url,omitempty"`

@@ -35,6 +35,7 @@ func CreatePost(input models.CreatePostInput, services models.HandlerServices, c
 
 	post := postmodel.Post{
 		ID:         postID,
+		Summary:    input.Summary,
 		Title:      input.Title,
 		Tags:       input.Tags,
 		HtmlS3Key:  htmlS3Key,
@@ -66,6 +67,10 @@ func UpdatePost(input models.UpdatePostInput, services models.HandlerServices, c
 
 	if input.Title != nil {
 		post.Title = *input.Title
+	}
+
+	if input.Summary != nil {
+		post.Summary = *input.Summary
 	}
 
 	if input.Tags != nil {
