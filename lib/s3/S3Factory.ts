@@ -17,6 +17,18 @@ export class S3Factory {
     return new s3.Bucket(this.stack, "PostsBucket", {
       bucketName: `${this.stack.stackName}-PostsBucket`.toLowerCase(),
       versioned: true,
+      cors: [
+        {
+          allowedOrigins: [
+            "http://localhost:3000",
+            cdk.Fn.importValue("BlogFrontendStack-BlogURL"),
+          ],
+          allowedMethods: [s3.HttpMethods.GET, s3.HttpMethods.HEAD],
+          allowedHeaders: ["*"],
+          exposedHeaders: ["ETag"],
+          maxAge: 3000,
+        },
+      ],
     });
   }
 
